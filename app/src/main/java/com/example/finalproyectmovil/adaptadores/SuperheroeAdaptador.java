@@ -18,11 +18,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptador.ViewHolder> 
-    implements Filterable {
+public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptador.ViewHolder>
+        implements Filterable {
 
-    private List<Superheroe> datos;
-    private List<Superheroe> datosFiltrados;
+    public List<Superheroe> datos;
+    public List<Superheroe> datosFiltrados;
 
     public SuperheroeAdaptador(List<Superheroe> datos) {
         this.datos = datos;
@@ -98,7 +98,10 @@ public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptado
             txt_descripcion.setText(dato.getDescripcion());
             txt_comics.setText(dato.getComics());
             txt_poderes.setText(dato.getPoderes());
-            Picasso.get().load(dato.getImagen()).into(img_superheroe);
+
+            Picasso.get()
+                    .load(dato.getImagen())
+                    .into(img_superheroe);
         }
     }
-} 
+}

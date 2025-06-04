@@ -1,111 +1,52 @@
 package com.example.finalproyectmovil;
 
 import android.os.Bundle;
-import android.widget.Toast;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.example.finalproyectmovil.adaptadores.SuperheroeAdaptador;
-import com.example.finalproyectmovil.clases.Superheroe;
-import com.example.finalproyectmovil.utils.MarvelUtils;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-
-    private RecyclerView rcv_lista_superheroes;
-    private List<Superheroe> listaSuperheroes = new ArrayList<>();
+    private BottomNavigationView btn_navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rcv_lista_superheroes = findViewById(R.id.rcv_lista_superheroes);
-        rcv_lista_superheroes.setLayoutManager(new LinearLayoutManager(this));
+        btn_navigation = findViewById(R.id.btn_navigation);
 
-        cargarSuperheroes();
-    }
+        // Cargar fragmento inicial
+        loadFragment(new Home());
 
-    private void cargarSuperheroes() {
-        String url = MarvelUtils.MARVEL_API_BASE_URL + "characters"
-                + "?ts=" + MarvelUtils.TS
-                + "&apikey=" + MarvelUtils.PUBLIC_KEY
-                + "&hash=" + MarvelUtils.generateHash()
-                + "&limit=50";
+        btn_navigation.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment selectedFragment = null;
 
-        StringRequest myRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            procesarRespuesta(new JSONObject(response));
-                        } catch (JSONException e) {
-                            Toast.makeText(MainActivity.this, 
-                                "Error en el servidor, intente mas tarde", 
-                                Toast.LENGTH_LONG).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this, 
-                            "Error en el servidor, intente mas tarde" + error.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                    }
-                });
-
-        RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
-        rq.add(myRequest);
-    }
-
-    public void procesarRespuesta(JSONObject respuesta) {
-        try {
-            JSONObject data = respuesta.getJSONObject("data");
-            JSONArray results = data.getJSONArray("results");
-
-            for (int i = 0; i < results.length(); i++) {
-                JSONObject hero = results.getJSONObject(i);
-                
-                String nombre = hero.getString("name");
-                String descripcion = hero.getString("description");
-                if (descripcion.isEmpty()) {
-                    descripcion = "No hay descripción disponible";
+                if (item.getItemId() == R.id.nav_home) {
+                    selectedFragment = new Home();
+                } else if (item.getItemId() == R.id.nav_comic) {
+                    selectedFragment = new Solicitar();
+                } else if (item.getItemId() == R.id.nav_setting) {
+                    selectedFragment = new Configuracion();
                 }
 
-                JSONObject thumbnail = hero.getJSONObject("thumbnail");
-                String imagen = thumbnail.getString("path") + "." + thumbnail.getString("extension");
-
-                JSONObject comics = hero.getJSONObject("comics");
-                String comicsInfo = "Comics disponibles: " + comics.getInt("available");
-
-                JSONObject series = hero.getJSONObject("series");
-                String poderes = "Apariciones en series: " + series.getInt("available");
-
-                Superheroe superheroe = new Superheroe(nombre, descripcion, imagen, comicsInfo, poderes);
-                listaSuperheroes.add(superheroe);
-
-                rcv_lista_superheroes.setLayoutManager(new LinearLayoutManager(this));
-                rcv_lista_superheroes.setAdapter(new SuperheroeAdaptador(listaSuperheroes));
+                if (selectedFragment != null) {
+                    loadFragment(selectedFragment);
+                    return true;
+                }
+                return false;
             }
-        } catch (JSONException e) {
-            Toast.makeText(MainActivity.this, 
-                "Error en el servidor, intente mas tarde", 
-                Toast.LENGTH_LONG).show();
-        }
+        });
+    }
+
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frm_container, fragment)
+                .commit();
     }
 }
