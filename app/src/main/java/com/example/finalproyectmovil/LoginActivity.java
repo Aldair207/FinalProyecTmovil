@@ -1,60 +1,57 @@
 package com.example.finalproyectmovil;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
-    private EditText etEmail;
-    private EditText etPassword;
-    private Button btnLogin;
-    private Button btnSignup;
+    private EditText etEmail, etPassword;
+    private Button btnLogin, btnSignup;
     private ImageView ivTogglePassword;
     private boolean isPasswordVisible = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Verificar si está logueado
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        boolean isLoggedIn = prefs.getBoolean("is_logged_in", false);
+        if (isLoggedIn) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
 
-        initializeViews();
-        setupListeners();
-    }
-
-    private void initializeViews() {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignup = findViewById(R.id.btnSignup);
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
 
-    }
-
-    private void setupListeners() {
         btnLogin.setOnClickListener(v -> validateAndLogin());
         btnSignup.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
+
         ivTogglePassword.setOnClickListener(v -> {
             if (isPasswordVisible) {
-                // Ocultar contraseña
-                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                etPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 ivTogglePassword.setImageResource(R.drawable.ic_visibility_closed);
             } else {
-                // Mostrar contraseña
-                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                etPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 ivTogglePassword.setImageResource(R.drawable.ic_visibility_open);
             }
-            // Mover el cursor al final
             etPassword.setSelection(etPassword.getText().length());
             isPasswordVisible = !isPasswordVisible;
         });
@@ -68,19 +65,26 @@ public class LoginActivity extends AppCompatActivity {
             etEmail.setError("Correo inválido");
             return;
         }
-
         if (TextUtils.isEmpty(password)) {
             etPassword.setError("La contraseña es requerida");
             return;
         }
 
-        // Aquí iría la llamada al servicio de autenticación
-        performLogin(email, password);
-    }
+        // Validar credenciales contra SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String registeredEmail = prefs.getString("registered_email", "");
+        String registeredPassword = prefs.getString("registered_password", "");
 
-    private void performLogin(String email, String password) {
-        // TODO: Implementar la llamada al servicio de autenticación
-        // Por ahora, simulamos una respuesta exitosa
-        Toast.makeText(this, "Iniciando sesión...", Toast.LENGTH_SHORT).show();
+        if (email.equals(registeredEmail) && password.equals(registeredPassword)) {
+            // Guardar estado logueado
+            prefs.edit().putBoolean("is_logged_in", true).apply();
+
+            Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
+        }
     }
-} 
+}
