@@ -121,40 +121,34 @@
             android:textColor="#00FFB3"
             android:textSize="12sp" />
 
+        // ... existing code ...
+
         <Button
-            android:id="@+id/btnlogin"
-            android:layout_width="wrap_content"
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
             android:background="@drawable/btn_gradient"
-            android:paddingLeft="45dp"
-            android:paddingRight="45dp"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
             android:text="LOGIN IN"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:textStyle="bold"
             android:textAllCaps="true"
-            android:elevation="8dp" />
-
+            android:padding="15dp" />
 
         <Button
-            android:id="@+id/btnSignUp"
-            android:layout_width="wrap_content"
+            android:id="@+id/btnSignup"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
             android:background="@drawable/btn_gradient"
-            android:paddingLeft="45dp"
-            android:paddingRight="45dp"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
             android:text="SIGN UP"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:textStyle="bold"
             android:textAllCaps="true"
-            android:elevation="8dp" />
+            android:padding="15dp" />
+
 
         <TextView
             android:id="@+id/tvRegister"
