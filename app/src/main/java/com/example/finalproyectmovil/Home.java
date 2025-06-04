@@ -120,7 +120,7 @@ public class Home extends Fragment {
                 }
 
                 JSONObject thumbnail = hero.getJSONObject("thumbnail");
-                String imagen = thumbnail.getString("path") + "." + thumbnail.getString("extension");
+                String imagen = thumbnail.getString("path").replace("http://", "https://") + "." + thumbnail.getString("extension");
 
                 JSONObject comics = hero.getJSONObject("comics");
                 String comicsInfo = "Comics disponibles: " + comics.getInt("available");
