@@ -40,7 +40,7 @@ public class Solicitar extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_solicitar, container, false);
+        View view = inflater.inflate(R.layout.fragment__solicitar, container, false);
 
         // Inicializar vistas
         spinnerComics = view.findViewById(R.id.spinner_comics);
