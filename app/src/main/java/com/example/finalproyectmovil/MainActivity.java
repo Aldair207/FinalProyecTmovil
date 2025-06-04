@@ -54,18 +54,18 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             procesarRespuesta(new JSONObject(response));
                         } catch (JSONException e) {
-                            Toast.makeText(MainActivity.this, 
-                                "Error en el servidor, intente mas tarde", 
-                                Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this,
+                                    "Error en el servidor, intente mas tarde",
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this, 
-                            "Error en el servidor, intente mas tarde" + error.getMessage(),
-                            Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this,
+                                "Error en el servidor, intente mas tarde" + error.getMessage(),
+                                Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < results.length(); i++) {
                 JSONObject hero = results.getJSONObject(i);
-                
+
                 String nombre = hero.getString("name");
                 String descripcion = hero.getString("description");
                 if (descripcion.isEmpty()) {
@@ -103,9 +103,9 @@ public class MainActivity extends AppCompatActivity {
                 rcv_lista_superheroes.setAdapter(new SuperheroeAdaptador(listaSuperheroes));
             }
         } catch (JSONException e) {
-            Toast.makeText(MainActivity.this, 
-                "Error en el servidor, intente mas tarde", 
-                Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this,
+                    "Error en el servidor, intente mas tarde",
+                    Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -28,6 +28,10 @@
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
+        <activity
+            android:name=".DetalleSuperheroeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FinalProyecTmovil" />
     </application>
 
 </manifest>
