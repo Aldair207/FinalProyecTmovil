@@ -39,8 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnSignup.setOnClickListener(v -> validateAndLogin());
-        btnLogin.setOnClickListener(v -> {
+        btnLogin.setOnClickListener(v -> validateAndLogin());
+        btnSignup.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
