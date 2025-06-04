@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,32 +15,69 @@ import com.example.finalproyectmovil.R;
 import com.example.finalproyectmovil.clases.Superheroe;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptador.ViewHolder> {
+public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptador.ViewHolder> 
+    implements Filterable {
 
     private List<Superheroe> datos;
+    private List<Superheroe> datosFiltrados;
 
     public SuperheroeAdaptador(List<Superheroe> datos) {
         this.datos = datos;
+        this.datosFiltrados = new ArrayList<>(datos);
     }
 
     @NonNull
     @Override
-    public SuperheroeAdaptador.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_superheroe, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SuperheroeAdaptador.ViewHolder holder, int position) {
-        Superheroe dato = datos.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Superheroe dato = datosFiltrados.get(position);
         holder.bind(dato);
     }
 
     @Override
     public int getItemCount() {
-        return datos.size();
+        return datosFiltrados.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<Superheroe> listaFiltrada = new ArrayList<>();
+
+                if (constraint == null || constraint.length() == 0) {
+                    listaFiltrada.addAll(datos);
+                } else {
+                    String filterPattern = constraint.toString().toLowerCase().trim();
+
+                    for (Superheroe item : datos) {
+                        if (item.getNombre().toLowerCase().contains(filterPattern)) {
+                            listaFiltrada.add(item);
+                        }
+                    }
+                }
+
+                FilterResults results = new FilterResults();
+                results.values = listaFiltrada;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                datosFiltrados.clear();
+                datosFiltrados.addAll((List) results.values);
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
