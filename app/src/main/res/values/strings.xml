@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FinalProyecTmovil</string>
+    <string name="hello_blank_fragment">Hola Fragmento</string>
 </resources>

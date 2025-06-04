@@ -11,10 +11,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.finalproyectmovil.adaptadores.SuperheroeAdaptador;
 import com.example.finalproyectmovil.clases.Superheroe;
+import com.example.finalproyectmovil.utils.MarvelUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,10 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rcv_lista_superheroes;
     private List<Superheroe> listaSuperheroes = new ArrayList<>();
-    private static final String MARVEL_API_BASE_URL = "https://gateway.marvel.com/v1/public/";
-    private static final String API_KEY = "TU_API_KEY"; // Reemplazar con tu API key de Marvel
-    private static final String HASH = "TU_HASH"; // Reemplazar con tu hash MD5
-    private static final String TS = "1"; // Timestamp
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,35 +41,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cargarSuperheroes() {
-        String url = MARVEL_API_BASE_URL + "characters"
-                + "?ts=" + TS
-                + "&apikey=" + API_KEY
-                + "&hash=" + HASH
-                + "&limit=50"; // Limitamos a 50 superhéroes por carga
+        String url = MarvelUtils.MARVEL_API_BASE_URL + "characters"
+                + "?ts=" + MarvelUtils.TS
+                + "&apikey=" + MarvelUtils.PUBLIC_KEY
+                + "&hash=" + MarvelUtils.generateHash()
+                + "&limit=50";
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
+        StringRequest myRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        procesarRespuesta(response);
+                    public void onResponse(String response) {
+                        try {
+                            procesarRespuesta(new JSONObject(response));
+                        } catch (JSONException e) {
+                            Toast.makeText(MainActivity.this, 
+                                "Error en el servidor, intente mas tarde", 
+                                Toast.LENGTH_LONG).show();
+                        }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(MainActivity.this, 
-                            "Error al cargar los superhéroes: " + error.getMessage(), 
+                            "Error en el servidor, intente mas tarde" + error.getMessage(),
                             Toast.LENGTH_LONG).show();
                     }
                 });
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-        queue.add(request);
+        RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
+        rq.add(myRequest);
     }
 
-    private void procesarRespuesta(JSONObject response) {
+    public void procesarRespuesta(JSONObject respuesta) {
         try {
-            JSONObject data = response.getJSONObject("data");
+            JSONObject data = respuesta.getJSONObject("data");
             JSONArray results = data.getJSONArray("results");
 
             for (int i = 0; i < results.length(); i++) {
@@ -84,27 +87,24 @@ public class MainActivity extends AppCompatActivity {
                     descripcion = "No hay descripción disponible";
                 }
 
-                // Construir la URL de la imagen
                 JSONObject thumbnail = hero.getJSONObject("thumbnail");
                 String imagen = thumbnail.getString("path") + "." + thumbnail.getString("extension");
 
-                // Obtener comics
                 JSONObject comics = hero.getJSONObject("comics");
                 String comicsInfo = "Comics disponibles: " + comics.getInt("available");
 
-                // Para los poderes, usaremos la lista de series como ejemplo
                 JSONObject series = hero.getJSONObject("series");
                 String poderes = "Apariciones en series: " + series.getInt("available");
 
                 Superheroe superheroe = new Superheroe(nombre, descripcion, imagen, comicsInfo, poderes);
                 listaSuperheroes.add(superheroe);
+
+                rcv_lista_superheroes.setLayoutManager(new LinearLayoutManager(this));
+                rcv_lista_superheroes.setAdapter(new SuperheroeAdaptador(listaSuperheroes));
             }
-
-            rcv_lista_superheroes.setAdapter(new SuperheroeAdaptador(listaSuperheroes));
-
         } catch (JSONException e) {
             Toast.makeText(MainActivity.this, 
-                "Error al procesar los datos: " + e.getMessage(), 
+                "Error en el servidor, intente mas tarde", 
                 Toast.LENGTH_LONG).show();
         }
     }
