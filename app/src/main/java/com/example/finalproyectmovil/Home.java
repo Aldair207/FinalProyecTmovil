@@ -74,7 +74,7 @@ public class Home extends Fragment {
                 + "?ts=" + MarvelUtils.TS
                 + "&apikey=" + MarvelUtils.PUBLIC_KEY
                 + "&hash=" + MarvelUtils.generateHash()
-                + "&limit=50";
+                + "&limit=100";
 
         Log.d(TAG, "URL de la petición: " + url);
 

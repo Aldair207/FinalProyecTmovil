@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +12,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -33,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
 
         calendar = Calendar.getInstance();
-        dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         // 1. Hacer el EditText no editable
         etBirthDate.setFocusable(false);
@@ -88,16 +97,53 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Guardar usuario registrado
-        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("registered_email", email);
-        editor.putString("registered_password", password);
-        editor.putString("registered_name", name);
-        editor.putString("registered_birthDate", birthDate);
-        editor.apply();
+        // Enviar datos a la API
+        new Thread(() -> {
+            try {
+                URL url = new URL("https://apiuser2-production.up.railway.app/api/register");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                conn.setDoOutput(true);
 
-        Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show();
-        finish(); // Regresa a LoginActivity
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("nombre", name);
+                jsonBody.put("correo", email);
+                jsonBody.put("password", password);
+                jsonBody.put("fecha_nacimiento", birthDate);
+
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonBody.toString().getBytes("UTF-8"));
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                InputStream is = (responseCode == 200) ? conn.getInputStream() : conn.getErrorStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                String responseText = sb.toString();
+                Log.e("API_RESPONSE", "Respuesta cruda: " + responseText); // 👈 Agregado
+
+            // Intenta parsear como JSON
+                JSONObject response = new JSONObject(responseText);
+                String message = response.optString("message", "");
+
+                runOnUiThread(() -> {
+                    if ("Registro exitoso".equalsIgnoreCase(message)) {
+                        Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                conn.disconnect();
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        }).start();
     }
+
 }
