@@ -67,7 +67,7 @@ public class Solicitar extends Fragment {
                 + "?ts=" + MarvelUtils.TS
                 + "&apikey=" + MarvelUtils.PUBLIC_KEY
                 + "&hash=" + MarvelUtils.generateHash()
-                + "&limit=50";
+                + "&limit=100";
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -88,7 +88,7 @@ public class Solicitar extends Fragment {
                             }
 
                             adaptador.notifyDataSetChanged();
-
+                            spinnerComics.setSelection(0);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             mostrarError("Error al procesar los datos");
