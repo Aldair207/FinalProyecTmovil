@@ -1,7 +1,5 @@
 package com.example.finalproyectmovil.adaptadores;
 
-import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +11,6 @@ import android.widget.Filterable;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.finalproyectmovil.DetalleSuperheroeActivity;
 import com.example.finalproyectmovil.R;
 import com.example.finalproyectmovil.clases.Superheroe;
 import com.squareup.picasso.Picasso;
@@ -21,46 +18,33 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptador.SuperheroeViewHolder> 
-    implements Filterable {
+public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptador.ViewHolder>
+        implements Filterable {
 
-    private List<Superheroe> listaSuperheroes;
-    private List<Superheroe> listaCompleta;
+    public List<Superheroe> datos;
+    public List<Superheroe> datosFiltrados;
 
-    public SuperheroeAdaptador(List<Superheroe> superheroes) {
-        this.listaSuperheroes = superheroes;
-        this.listaCompleta = new ArrayList<>(superheroes);
+    public SuperheroeAdaptador(List<Superheroe> datos) {
+        this.datos = datos;
+        this.datosFiltrados = new ArrayList<>(datos);
     }
 
     @NonNull
     @Override
-    public SuperheroeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_superheroe, parent, false);
-        return new SuperheroeViewHolder(view);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_superheroe, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SuperheroeViewHolder holder, int position) {
-        Superheroe superheroe = listaSuperheroes.get(position);
-        holder.bind(superheroe);
-
-        // Configurar el click listener
-        holder.itemView.setOnClickListener(v -> {
-            Context context = holder.itemView.getContext();
-            Intent intent = new Intent(context, DetalleSuperheroeActivity.class);
-            intent.putExtra(DetalleSuperheroeActivity.EXTRA_NOMBRE, superheroe.getNombre());
-            intent.putExtra(DetalleSuperheroeActivity.EXTRA_DESCRIPCION, superheroe.getDescripcion());
-            intent.putExtra(DetalleSuperheroeActivity.EXTRA_IMAGEN, superheroe.getImagen());
-            intent.putExtra(DetalleSuperheroeActivity.EXTRA_COMICS, superheroe.getComics());
-            intent.putExtra(DetalleSuperheroeActivity.EXTRA_PODERES, superheroe.getPoderes());
-            context.startActivity(intent);
-        });
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Superheroe dato = datosFiltrados.get(position);
+        holder.bind(dato);
     }
 
     @Override
     public int getItemCount() {
-        return listaSuperheroes.size();
+        return datosFiltrados.size();
     }
 
     @Override
@@ -71,13 +55,13 @@ public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptado
                 List<Superheroe> listaFiltrada = new ArrayList<>();
 
                 if (constraint == null || constraint.length() == 0) {
-                    listaFiltrada.addAll(listaCompleta);
+                    listaFiltrada.addAll(datos);
                 } else {
                     String filterPattern = constraint.toString().toLowerCase().trim();
 
-                    for (Superheroe superheroe : listaCompleta) {
-                        if (superheroe.getNombre().toLowerCase().contains(filterPattern)) {
-                            listaFiltrada.add(superheroe);
+                    for (Superheroe item : datos) {
+                        if (item.getNombre().toLowerCase().contains(filterPattern)) {
+                            listaFiltrada.add(item);
                         }
                     }
                 }
@@ -89,34 +73,35 @@ public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptado
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                listaSuperheroes.clear();
-                listaSuperheroes.addAll((List) results.values);
+                datosFiltrados.clear();
+                datosFiltrados.addAll((List) results.values);
                 notifyDataSetChanged();
             }
         };
     }
 
-    static class SuperheroeViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView ivSuperheroe;
-        private final TextView tvNombre;
-        private final TextView tvDescripcion;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView txt_nombre, txt_descripcion, txt_comics, txt_poderes;
+        ImageView img_superheroe;
 
-        public SuperheroeViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivSuperheroe = itemView.findViewById(R.id.iv_superheroe);
-            tvNombre = itemView.findViewById(R.id.tv_nombre);
-            tvDescripcion = itemView.findViewById(R.id.tv_descripcion);
+            txt_nombre = itemView.findViewById(R.id.txt_nombre);
+            txt_descripcion = itemView.findViewById(R.id.txt_descripcion);
+            txt_comics = itemView.findViewById(R.id.txt_comics);
+            txt_poderes = itemView.findViewById(R.id.txt_poderes);
+            img_superheroe = itemView.findViewById(R.id.img_superheroe);
         }
 
-        public void bind(Superheroe superheroe) {
-            tvNombre.setText(superheroe.getNombre());
-            tvDescripcion.setText(superheroe.getDescripcion());
-            
-            if (superheroe.getImagen() != null && !superheroe.getImagen().isEmpty()) {
-                Picasso.get()
-                        .load(superheroe.getImagen())
-                        .into(ivSuperheroe);
-            }
+        public void bind(Superheroe dato) {
+            txt_nombre.setText(dato.getNombre());
+            txt_descripcion.setText(dato.getDescripcion());
+            txt_comics.setText(dato.getComics());
+            txt_poderes.setText(dato.getPoderes());
+
+            Picasso.get()
+                    .load(dato.getImagen())
+                    .into(img_superheroe);
         }
     }
-} 
+}
