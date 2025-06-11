@@ -21,12 +21,18 @@ import java.util.List;
 public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptador.ViewHolder>
         implements Filterable {
 
+    public interface OnSuperheroeClickListener {
+        void onSuperheroeClick(Superheroe superheroe);
+    }
+
     public List<Superheroe> datos;
     public List<Superheroe> datosFiltrados;
+    private OnSuperheroeClickListener listener;
 
-    public SuperheroeAdaptador(List<Superheroe> datos) {
+    public SuperheroeAdaptador(List<Superheroe> datos, OnSuperheroeClickListener listener) {
         this.datos = datos;
         this.datosFiltrados = new ArrayList<>(datos);
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,7 +45,7 @@ public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptado
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Superheroe dato = datosFiltrados.get(position);
-        holder.bind(dato);
+        holder.bind(dato, listener);
     }
 
     @Override
@@ -93,7 +99,7 @@ public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptado
             img_superheroe = itemView.findViewById(R.id.img_superheroe);
         }
 
-        public void bind(Superheroe dato) {
+        public void bind(Superheroe dato, OnSuperheroeClickListener listener) {
             txt_nombre.setText(dato.getNombre());
             txt_descripcion.setText(dato.getDescripcion());
             txt_comics.setText(dato.getComics());
@@ -102,6 +108,12 @@ public class SuperheroeAdaptador extends RecyclerView.Adapter<SuperheroeAdaptado
             Picasso.get()
                     .load(dato.getImagen())
                     .into(img_superheroe);
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onSuperheroeClick(dato);
+                }
+            });
         }
     }
 }

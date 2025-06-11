@@ -1,5 +1,6 @@
 package com.example.finalproyectmovil;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -52,7 +53,16 @@ public class Home extends Fragment {
         etSearch = view.findViewById(R.id.etSearch);
 
         rcv_lista_superheroes.setLayoutManager(new LinearLayoutManager(getContext()));
-        adaptador = new SuperheroeAdaptador(listaSuperheroes);
+        adaptador = new SuperheroeAdaptador(listaSuperheroes, superheroe -> {
+            // Acción al hacer clic
+            Intent intent = new Intent(getContext(), DetalleSuperheroeActivity.class);
+            intent.putExtra(DetalleSuperheroeActivity.EXTRA_NOMBRE, superheroe.getNombre());
+            intent.putExtra(DetalleSuperheroeActivity.EXTRA_DESCRIPCION, superheroe.getDescripcion());
+            intent.putExtra(DetalleSuperheroeActivity.EXTRA_IMAGEN, superheroe.getImagen());
+            intent.putExtra(DetalleSuperheroeActivity.EXTRA_COMICS, superheroe.getComics());
+            intent.putExtra(DetalleSuperheroeActivity.EXTRA_PODERES, superheroe.getPoderes());
+            startActivity(intent);
+        });
         rcv_lista_superheroes.setAdapter(adaptador);
 
         // Listener para filtro búsqueda
