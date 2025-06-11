@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@android:color/black">
 
         <ImageView
             android:id="@+id/img_superheroe"
@@ -28,14 +29,15 @@
             android:layout_marginTop="8dp"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textColor="#00FFB3" /> <!-- Título verde -->
 
         <TextView
             android:id="@+id/txt_descripcion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="@android:color/white" /> <!-- Información blanca -->
 
         <TextView
             android:id="@+id/txt_comics"
@@ -43,7 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="14sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:textColor="#00FFB3" /> <!-- Título verde -->
 
         <TextView
             android:id="@+id/txt_poderes"
@@ -51,8 +54,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="#00FFB3" /> <!-- Título verde -->
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView> 
+</androidx.cardview.widget.CardView>
